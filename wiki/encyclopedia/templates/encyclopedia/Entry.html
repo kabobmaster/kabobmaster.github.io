@@ -7,5 +7,10 @@
 {% block body %}
     
     {{ entries|safe }}
+    <form action="editpage" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Edit Page" name="{{title}}">
+        <input type="text" value="{{title}}" name="title" hidden>
+    </form>
 
 {% endblock %}

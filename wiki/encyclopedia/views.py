@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django import forms
+from random import choice
 
 from . import util
 
@@ -58,7 +59,8 @@ def savepage(request):
         if form.is_valid():
             title = form.cleaned_data["formtitle"]
             body = form.cleaned_data["content"]
-            if title in util.list_entries():
+            name = request.POST['name']
+            if title in util.list_entries() and name != "edit":
                 return HttpResponse("<h1 style=\"color:red\">Try a new title!</h1>")
 
             #save and write to md file
@@ -72,3 +74,20 @@ def savepage(request):
         "entries": markdown2.markdown(util.get_entry(title)),
         "title": title
         })
+
+def editpage(request):
+    #check post, send page title
+    #read title and body, pre-populate 
+    #save writes over file, not required because should be handled by savepage fxn
+    if request.method == "POST":
+        title = request.POST['title']
+        file = open(f"entries/{title}.md", "r")
+        form = newform(initial={'formtitle': title, 'content': file.read()})
+        file.close()
+    return render(request, "encyclopedia/edit.html", {
+        "form": form
+        })
+
+def randompage(request):
+    title = util.list_entries()
+    return entry(request, choice(title))
