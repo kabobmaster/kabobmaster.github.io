@@ -18,7 +18,9 @@ def index(request):
 
 def entry(request, title):
     list_of_entries = util.list_entries()
-    if title.upper() in list_of_entries:
+    if title in list_of_entries:
+        new = title
+    elif title.upper() in list_of_entries:
         new = title.upper()
     elif title.capitalize() in list_of_entries:
         new = title.capitalize()
