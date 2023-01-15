@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django import forms
-from django.contrib import messages
 
 from . import util
 
@@ -60,7 +59,7 @@ def savepage(request):
             title = form.cleaned_data["formtitle"]
             body = form.cleaned_data["content"]
             if title in util.list_entries():
-                return HttpResponse(f"<h1 style=\"color:red\">Try a new title!</h1>")
+                return HttpResponse("<h1 style=\"color:red\">Try a new title!</h1>")
 
             #save and write to md file
             file = open(f"entries/{title}.md", "w")
@@ -72,4 +71,4 @@ def savepage(request):
     return render(request, "encyclopedia/Entry.html", {
         "entries": markdown2.markdown(util.get_entry(title)),
         "title": title
-    })
+        })
