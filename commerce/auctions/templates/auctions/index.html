@@ -4,6 +4,9 @@
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        {{ listing }}
+        <div>
+        Title: {{ listing.title }} <br>
+        Description {{ listing.description }} <br>
+        </div>
     {% endfor %}
 {% endblock %}

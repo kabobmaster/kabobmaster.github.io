@@ -8,7 +8,7 @@ class User(AbstractUser):
 class listings(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=1000)
-    bid = models.FloatField(max=1000000)
+    bid = models.FloatField()
     category = models.CharField(max_length=64)
     image = models.CharField(max_length=1000)
 

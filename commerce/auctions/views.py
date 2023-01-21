@@ -18,7 +18,9 @@ class newform(forms.Form):
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listings": listings.objects.all()
+    })
 
 
 def login_view(request):
@@ -76,13 +78,15 @@ def register(request):
 def create_listing(request):
     if request.method == "POST":
         #store everything in the model, including who created it.
-        listings.title = request.POST["title"]
-        listings.description = request.POST["description"]
-        listings.bid = request.POST["bid"]
-        listings.category = request.POST["category"]
-        listings.image = request.POST["image"]
+        title = request.POST["title"]
+        description = request.POST["description"]
+        bid = request.POST["bid"]
+        category = request.POST["category"]
+        image = request.POST["image"]
+        listing = listings(title=title, description=description, bid=bid, category=category, image=image)
+        listing.save()
         return HttpResponseRedirect(reverse("index"),{
-            "listings": listings
+            "listings": listings.objects.all()
         })
     return render(request, "auctions/create.html", {
         "form": newform(),
