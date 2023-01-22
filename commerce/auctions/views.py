@@ -16,12 +16,10 @@ class newform(forms.Form):
     category = forms.CharField(label="Category")
     image = forms.CharField(label="Image URL")
 
-
 def index(request):
     return render(request, "auctions/index.html", {
         "listings": listings.objects.all()
     })
-
 
 def login_view(request):
     if request.method == "POST":
@@ -42,11 +40,9 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
-
 
 def register(request):
     if request.method == "POST":
@@ -90,4 +86,33 @@ def create_listing(request):
         })
     return render(request, "auctions/create.html", {
         "form": newform(),
+    })
+
+def show_listing(request, listings_id):
+    list_id = listings.objects.get(pk=listings_id)
+    return render(request, "auctions/listing.html",{
+        "listing": list_id
+    })
+
+@login_required
+def watchlist_view(request):
+    if request.method == "POST":
+        subject = request.POST["name"]
+        listingid = request.POST["listingid"]
+        mylist = list(watchlist.watching.get_queryset().values_list('id', flat=True))
+        if subject == "add":
+            #need to import IDs
+            print(mylist)
+            if watchlist.objects.filter(watching_id=listingid):
+                return render(request, "auctions/listing.html",{
+                "listing": listings.objects.get(pk=listingid),
+                "message": "Already in Watchlist"
+                })
+            else:
+                item = watchlist(user=request.user, watching=listings.objects.get(id=listingid))
+                item.save()
+        elif subject == "remove":
+            item = watchlist.objects.filter(watching_id=listingid).delete()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist.objects.filter(user=request.user)
     })

@@ -1,0 +1,18 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Watchlist
+{% endblock %}
+
+{% block body %}    
+    <h1>Watchlist</h1>
+    {% for w in watchlist %}
+    <div>
+        Title: {{ w.watching.title }} <br>
+        Description: {{ w.watching.description }} <br>
+        Category: {{ w.watching.category }} <br>
+        Price: {{ w.watching.bid }} <br>
+        Image: <img src="{{ w.watching.image }}" alt="" width="500px">  <br>
+    </div>
+    {% endfor %}
+{% endblock %}
