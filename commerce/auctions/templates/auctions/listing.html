@@ -7,31 +7,62 @@
 {% block body %}
     <h1>Listing #{{ listing.id }}</h1>
     <div>
+        {% if user.is_authenticated %}
+        {% if listing.status == "closed" and bids.user.id == user.id %}
+        <h5>You won this auction!</h5>
+        {% endif %}
         <div>
             {% if message %}
                 <div>{{ message }}</div>
             {% endif %}
             <form method="post" action="watchlist">
-                {% csrf_token %}
-                {% if user.is_authenticated %}
+                {% csrf_token %}                
                 <button name="name" type="submit" value="add">Add to Watchlist</button>
+                {% for w in watchlist %}
+                {% if listing.id == w.watching.id %}
                 <button name="name" type="submit" value="remove">Remove from Watchlist</button>
-                <input type="text" value="{{ listing.id }}" hidden name="listingid">
                 {% endif %}
+                {% endfor %}
+                <input type="text" value="{{ listing.id }}" hidden name="listingid">
             </form>
-        </div>
+            {% if user.id == listing.user.id and listing.status == "open" %}
+            <form method="post" action="close">
+                {% csrf_token %}                
+                <button name="status" type="submit" value="closed">Close Auction</button>
+                <input type="text" value="{{ listing.id }}" hidden name="listingid">
+            </form>
+            {% endif %}
+        </div>  
+        {% endif %}
         Title: {{ listing.title }} <br>
         Description: {{ listing.description }} <br>
         Category: {{ listing.category }} <br>
         Price: {{ listing.bid }}             
         <form method="post" action="bid">
             {% csrf_token %}
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and listing.status == "open" %}
             <input type="number" step="0.01" name="bid">
             <input name="submit" type="submit" value="Make Bid">
             <input type="text" value="{{ listing.id }}" hidden name="listingid">
+            {% else %}
+            <p>SOLD</p>
             {% endif %}
         </form><br>
         Image: <img src="{{ listing.image }}" alt="" width="500px">  <br>
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <form method="post" action="comments">
+        {% csrf_token %}
+        <input type="text" name="comment">
+        <input name="submit" type="submit" value="Add Comment">
+        <input type="text" value="{{ listing.id }}" hidden name="listingid">
+        </form>
+        {% endif %}
+        <ul>
+        {% for comment in comments %}
+        <li>{{ comment.comment }}</li>
+        {% endfor %}
+        </ul>
     </div>
 {% endblock %}

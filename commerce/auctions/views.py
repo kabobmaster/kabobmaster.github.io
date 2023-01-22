@@ -9,11 +9,22 @@ from auctions.models import *
 
 from .models import User
 
+CATEGORY = [
+    ('Appliance', 'Appliance'),
+    ('Furniture', "Furniture"),
+    ('Electronics', 'Electronics'),
+    ('Cars', 'Cars'),
+    ('Sports', 'Sports'),
+    ('Games', 'Games'),
+    ('Home', 'Home'),
+    ('Other', 'Other')
+]
+
 class newform(forms.Form):
     title = forms.CharField(label="Title")
     description = forms.CharField(widget=forms.Textarea(attrs={"rows":"5"}), label="Description")
     bid = forms.FloatField(label="Bid", min_value=0)
-    category = forms.CharField(label="Category")
+    category = forms.CharField(label="Category", widget=forms.Select(choices=CATEGORY))
     image = forms.CharField(label="Image URL")
 
 def index(request):
@@ -79,19 +90,27 @@ def create_listing(request):
         bid = request.POST["bid"]
         category = request.POST["category"]
         image = request.POST["image"]
-        listing = listings(title=title, description=description, bid=bid, category=category, image=image)
+        listing = listings(user=request.user, title=title, description=description, bid=bid, category=category, image=image)
         listing.save()
         return HttpResponseRedirect(reverse("index"),{
             "listings": listings.objects.all()
         })
     return render(request, "auctions/create.html", {
-        "form": newform(),
+        "form": newform()
     })
 
 def show_listing(request, listings_id):
     list_id = listings.objects.get(pk=listings_id)
+    if not request.user.is_authenticated:
+        return render(request, "auctions/listing.html",{
+        "listing": list_id,
+        "comments": comments.objects.filter(listing=list_id)
+        })
     return render(request, "auctions/listing.html",{
-        "listing": list_id
+        "listing": list_id,
+        "watchlist": watchlist.objects.filter(user=request.user),
+        "bids": bids.objects.filter(listing=list_id).last(),
+        "comments": comments.objects.filter(listing=list_id)
     })
 
 @login_required
@@ -124,8 +143,55 @@ def bid(request):
         for c in current_bid:
             if bid_amount > c.bid:
                 #replace bid else too low message
-                return HttpResponseRedirect(reverse("index"))
+                listings.objects.filter(id=listingid).update(bid=bid_amount)
+                item = bids(user=request.user, amount=bid_amount, listing=listings.objects.get(id=listingid))
+                item.save()
+                return render(request, "auctions/listing.html",{
+                "listing": listings.objects.get(pk=listingid),
+                "message": "You are now the highest bidder!"
+                })
     return render(request, "auctions/listing.html",{
         "listing": listings.objects.get(pk=listingid),
         "message": "Amount too low!"
         })
+
+@login_required
+def close_listing(request):
+    if request.method == "POST":
+        status = request.POST["status"]
+        listingid = request.POST["listingid"]
+        listings.objects.filter(id=listingid).update(status=status)
+        return render(request, "auctions/listing.html",{
+        "listing": listings.objects.get(pk=listingid),
+        "message": "Sold!"
+        })
+
+def make_comments(request):
+    if request.method == "POST":
+        comment = request.POST["comment"]
+        listingid = request.POST["listingid"]
+        new = comments(user=request.user, comment=comment, listing=listings.objects.get(id=listingid))
+        new.save()
+        return render(request, "auctions/listing.html",{
+        "listing": listings.objects.get(pk=listingid),
+        "comments": comments.objects.filter(listing=listingid),
+        "message": "That a boy!"
+        })
+
+def categories(request):
+    mylist = list(listings.objects.get_queryset().values_list('category', flat=True))
+    new_list = []
+    for item in mylist:
+        if item not in new_list:
+            new_list.append(item)
+    return render(request, "auctions/categories.html", {
+        "listings": listings.objects.all(),
+        "categories": new_list
+    })
+
+def category_view(request, category):
+    list_id = listings.objects.filter(category=category)
+    return render(request, "auctions/category.html",{
+    "listings": list_id,
+    "category": category
+    })
