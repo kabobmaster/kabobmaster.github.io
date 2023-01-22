@@ -99,10 +99,9 @@ def watchlist_view(request):
     if request.method == "POST":
         subject = request.POST["name"]
         listingid = request.POST["listingid"]
-        mylist = list(watchlist.watching.get_queryset().values_list('id', flat=True))
+        # mylist = list(watchlist.watching.get_queryset().values_list('id', flat=True))
         if subject == "add":
             #need to import IDs
-            print(mylist)
             if watchlist.objects.filter(watching_id=listingid):
                 return render(request, "auctions/listing.html",{
                 "listing": listings.objects.get(pk=listingid),
@@ -114,5 +113,19 @@ def watchlist_view(request):
         elif subject == "remove":
             item = watchlist.objects.filter(watching_id=listingid).delete()
     return render(request, "auctions/watchlist.html", {
-        "watchlist": watchlist.objects.filter(user=request.user)
+        "watchlist": watchlist.objects.filter(user=request.user).order_by("watching")
     })
+
+def bid(request):
+    if request.method == "POST":
+        bid_amount = float(request.POST["bid"])
+        listingid = request.POST["listingid"]
+        current_bid = listings.objects.filter(id=listingid)
+        for c in current_bid:
+            if bid_amount > c.bid:
+                #replace bid else too low message
+                return HttpResponseRedirect(reverse("index"))
+    return render(request, "auctions/listing.html",{
+        "listing": listings.objects.get(pk=listingid),
+        "message": "Amount too low!"
+        })

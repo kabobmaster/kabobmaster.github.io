@@ -23,7 +23,15 @@
         Title: {{ listing.title }} <br>
         Description: {{ listing.description }} <br>
         Category: {{ listing.category }} <br>
-        Price: {{ listing.bid }} <br>
+        Price: {{ listing.bid }}             
+        <form method="post" action="bid">
+            {% csrf_token %}
+            {% if user.is_authenticated %}
+            <input type="number" step="0.01" name="bid">
+            <input name="submit" type="submit" value="Make Bid">
+            <input type="text" value="{{ listing.id }}" hidden name="listingid">
+            {% endif %}
+        </form><br>
         Image: <img src="{{ listing.image }}" alt="" width="500px">  <br>
     </div>
 {% endblock %}

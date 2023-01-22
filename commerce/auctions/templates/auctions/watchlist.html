@@ -8,7 +8,7 @@
     <h1>Watchlist</h1>
     {% for w in watchlist %}
     <div>
-        Title: {{ w.watching.title }} <br>
+        Title: <a href="{% url 'listing' w.watching.id %}">{{ w.watching.title }}</a> <br>
         Description: {{ w.watching.description }} <br>
         Category: {{ w.watching.category }} <br>
         Price: {{ w.watching.bid }} <br>

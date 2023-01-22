@@ -12,6 +12,7 @@ class listings(models.Model):
     bid = models.FloatField()
     category = models.CharField(max_length=64)
     image = models.CharField(max_length=1000)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 class watchlist(models.Model):
     time = models.DateTimeField(default=datetime.now())
@@ -19,11 +20,11 @@ class watchlist(models.Model):
     watching = models.ForeignKey(listings, on_delete=models.CASCADE, related_name="watch")
 
 class bids(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.FloatField()
-    listing = models.ForeignKey(listings, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.FloatField(null=True, blank=True)
+    listing = models.ForeignKey(listings, on_delete=models.CASCADE, null=True, blank=True)
 
 class comments(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=1000)
-    listing = models.ForeignKey(listings, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.CharField(max_length=1000, null=True, blank=True)
+    listing = models.ForeignKey(listings, on_delete=models.CASCADE, null=True, blank=True)
