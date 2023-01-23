@@ -11,16 +11,16 @@
         {% if listing.status == "closed" and bids.user.id == user.id %}
         <h5>You won this auction!</h5>
         {% endif %}
-        <div>
+        <div class="mb-3">
             {% if message %}
                 <div>{{ message }}</div>
             {% endif %}
             <form method="post" action="watchlist">
                 {% csrf_token %}                
-                <button name="name" type="submit" value="add">Add to Watchlist</button>
+                <button name="name" type="submit" value="add" class="btn btn-secondary">Add to Watchlist</button>
                 {% for w in watchlist %}
                 {% if listing.id == w.watching.id %}
-                <button name="name" type="submit" value="remove">Remove from Watchlist</button>
+                <button name="name" type="submit" value="remove" class="btn btn-secondary">Remove from Watchlist</button>
                 {% endif %}
                 {% endfor %}
                 <input type="text" value="{{ listing.id }}" hidden name="listingid">
@@ -34,22 +34,27 @@
             {% endif %}
         </div>  
         {% endif %}
-        Title: {{ listing.title }} <br>
-        Description: {{ listing.description }} <br>
-        Category: {{ listing.category }} <br>
-        Price: {{ listing.bid }}             
-        <form method="post" action="bid">
-            {% csrf_token %}
-            {% if user.is_authenticated and listing.status == "open" %}
-            <input type="number" step="0.01" name="bid">
-            <input name="submit" type="submit" value="Make Bid">
-            <input type="text" value="{{ listing.id }}" hidden name="listingid">
-            {% else %}
-            <p>SOLD</p>
-            {% endif %}
-        </form><br>
-        Image: <img src="{{ listing.image }}" alt="" width="500px">  <br>
-    </div>
+        <div class="mb-3" style="display: flex; flex-wrap: wrap; border-style: outset;">
+                <h6 style="padding: 5px;">Title: {{ listing.title }}</h6> <br>
+                Description: {{ listing.description }} <br>
+                Category: {{ listing.category }} <br>
+                <h6 style="padding: 5px;">Price: {{ listing.bid }}</h6>             
+                <form method="post" action="bid">
+                    {% csrf_token %}
+                    {% if user.is_authenticated and listing.status == "open" %}
+                    <input type="number" step="0.01" name="bid" class="form-label">
+                    <input name="submit" type="submit" value="Make Bid" class="btn btn-primary">
+                    <input type="text" value="{{ listing.id }}" hidden name="listingid">
+                    {% else %}
+                    <p>SOLD</p>
+                    {% endif %}
+                </form>
+
+            <img src="{{ listing.image }}" alt="" height="300px">  <br>
+        
+        </div>
+
+        </div>
     <div>
         {% if user.is_authenticated %}
         <form method="post" action="comments">
@@ -59,6 +64,8 @@
         <input type="text" value="{{ listing.id }}" hidden name="listingid">
         </form>
         {% endif %}
+    </div>    
+    <div style="display: flex; flex-wrap: wrap; border-style: outset;">
         <ul>
         {% for comment in comments %}
         <li>{{ comment.comment }}</li>

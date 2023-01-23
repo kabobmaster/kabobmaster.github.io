@@ -2,14 +2,15 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
+    <div class="text-center" style="display: flex; flex-wrap: wrap;">
     {% for listing in listings %}
-        <div>
-        Title: <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a> <br>
-        Description: {{ listing.description }} <br>
-        Category: {{ listing.category }} <br>
-        Bid: {{ listing.bid }} <br>
-        Image: <img src="{{ listing.image }}" alt="" width="500px"> <br>
+        <div style="padding: 10px; border-style: outset;">
+            <h6><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h6>
+            Description: {{ listing.description }} <br>
+            Category: {{ listing.category }} <br>
+            <h6>Bid: {{ listing.bid }}</h6>
+            <img src="{{ listing.image }}" alt="" width="250px" height="auto" > <br>
         </div>
     {% endfor %}
+    </div> 
 {% endblock %}

@@ -6,13 +6,15 @@
 
 {% block body %}    
     <h1>Watchlist</h1>
-    {% for w in watchlist %}
-    <div>
-        Title: <a href="{% url 'listing' w.watching.id %}">{{ w.watching.title }}</a> <br>
-        Description: {{ w.watching.description }} <br>
-        Category: {{ w.watching.category }} <br>
-        Price: {{ w.watching.bid }} <br>
-        Image: <img src="{{ w.watching.image }}" alt="" width="500px">  <br>
+    <div class="text-center" style="display: flex; flex-wrap: wrap; border-style: outset;">
+        {% for w in watchlist %}
+        <div>    
+        <h6><a href="{% url 'listing' w.watching.id %}">{{ w.watching.title }}</a></h6>
+            Description: {{ w.watching.description }} <br>
+            Category: {{ w.watching.category }} <br>
+            Price: {{ w.watching.bid }} <br>
+            <img src="{{ w.watching.image }}" alt="" height="300px">  <br>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 {% endblock %}

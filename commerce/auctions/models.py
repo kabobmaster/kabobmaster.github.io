@@ -12,7 +12,7 @@ class listings(models.Model):
     bid = models.FloatField()
     category = models.CharField(max_length=64)
     image = models.CharField(max_length=1000)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=10, default="open")
     #open/close status field, default to open, update to closed
 

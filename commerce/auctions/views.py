@@ -143,9 +143,9 @@ def bid(request):
         for c in current_bid:
             if bid_amount > c.bid:
                 #replace bid else too low message
-                listings.objects.filter(id=listingid).update(bid=bid_amount)
                 item = bids(user=request.user, amount=bid_amount, listing=listings.objects.get(id=listingid))
                 item.save()
+                listings.objects.filter(id=listingid).update(bid=bid_amount)
                 return render(request, "auctions/listing.html",{
                 "listing": listings.objects.get(pk=listingid),
                 "message": "You are now the highest bidder!"
