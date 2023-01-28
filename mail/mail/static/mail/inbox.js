@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
   document.querySelector('#compose-form').addEventListener('submit', () => send_mail());
-  document.querySelector('#archive').style.display = 'none';
-  document.querySelector('#unarchive').style.display = 'none';
 
   // By default, load the inbox
   load_mailbox('inbox');
@@ -19,6 +17,8 @@ function compose_email() {
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
   document.querySelector('#email-view').style.display = 'none';
+  document.querySelector('#arc').innerHTML = '';
+  document.querySelector('#reply').style.display = 'none';
   
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -52,6 +52,7 @@ function show_email(email_id) {
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'none';
     document.querySelector('#email-view').style.display = 'block';
+    document.querySelector('#reply').style.display = 'block';
 
         fetch(`/emails/${email_id}`)
         .then(response => response.json())
@@ -72,9 +73,57 @@ function show_email(email_id) {
               //archive button
               user = document.querySelector('#user').value;
               if (user == email.recipients) {
-                document.querySelector('#archive').style.display = 'block';
-                //doesnt work well, instead either do via HTML or CSS maybe?
+                archive = document.querySelector('#arc');
+                archive.innerHTML = "<button class='btn btn-sm btn-outline-primary' id='archive'>Archive</button>";
+
+                //mark email archived
+              archive.addEventListener('click', function() {
+                //mark email as archived
+                 fetch(`/emails/${email_id}`, {
+                   method: 'PUT',
+                   body: JSON.stringify({
+                   archived: true
+                   })
+                   });
+
+                   load_mailbox('inbox');
+               });
               }
+              if (email.archived == true) {
+                unarchive = document.querySelector('#arc');
+                unarchive.innerHTML = "<button class='btn btn-sm btn-outline-primary' id='unarchive'>Unarchive</button>";
+
+                unarchive.addEventListener('click', function() {
+                  //mark email as unarchived
+                   fetch(`/emails/${email_id}`, {
+                     method: 'PUT',
+                     body: JSON.stringify({
+                     archived: false
+                     })
+                     });
+ 
+                     load_mailbox('inbox');
+                 });
+              }
+              
+                 //reply button action
+                 reply = document.querySelector('#re');
+                 reply.addEventListener('click', function (){
+                  compose_email();
+
+                  console.log(email.subject[0]+email.subject[1]);
+                  
+                  document.querySelector('#compose-recipients').value = `${email.sender}`;
+                  if (email.subject[0]+email.subject[1] == 'Re'){
+                    document.querySelector('#compose-subject').value = `${email.subject}`;
+                  }
+                  else {
+                    document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
+                  }
+                  document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote: "${email.body}"`;
+
+                 });
+
         });
 
 }
@@ -85,6 +134,8 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'none';
+  document.querySelector('#arc').innerHTML = '';
+  document.querySelector('#reply').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
