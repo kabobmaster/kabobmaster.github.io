@@ -59,7 +59,7 @@ function show_email(email_id) {
         .then(email => {
             // Print email   
               const element = document.querySelector('#email-view');
-              element.innerHTML = `From: ${email.sender} To: ${email.recipients} Subject: ${email.subject} Timestamp: ${email.timestamp} Body: ${email.body}`;
+              element.innerHTML = `<div>From: ${email.sender}</div><div>To: ${email.recipients}</div><h6>Subject: ${email.subject}</h6><div>${email.timestamp}</div><br><div>${email.body}</div>`;
               element.style.borderStyle = 'outset';
               
             //mark email as read
@@ -110,8 +110,6 @@ function show_email(email_id) {
                  reply = document.querySelector('#re');
                  reply.addEventListener('click', function (){
                   compose_email();
-
-                  console.log(email.subject[0]+email.subject[1]);
                   
                   document.querySelector('#compose-recipients').value = `${email.sender}`;
                   if (email.subject[0]+email.subject[1] == 'Re'){
@@ -148,7 +146,7 @@ function load_mailbox(mailbox) {
     // Print emails
     emails.forEach(i => {
       const element = document.createElement('div');
-      element.innerHTML = `Sender: ${i.sender} Subject: ${i.subject} Timestamp: ${i.timestamp}`;
+      element.innerHTML = `<h6>Sender: ${i.sender}</h6><h6>Subject: ${i.subject}</h6><p>${i.timestamp}</p>`;
       element.style.borderStyle = 'outset';
    
       if (i.read == false){
